@@ -25,10 +25,31 @@ class AuthApiController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        //version anterior
+        // if (! $user || ! Hash::check($request->password, $user->password)) {
+        //     throw ValidationException::withMessages([
+        //         'email' => ['Las credenciales proporcionadas son incorrectas.'],
+        //     ]);
+        // }
+
+        //version nueva
+        // 1. Verificar credenciales básicas
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Credenciales incorrectas.'
+            ], 401);
+        }
+
+        // 2. NUEVA VERIFICACIÓN: Consultar el estado en la tabla de solicitudes
+        // Importante: Asegúrate de importar use App\Models\AccessRequest; arriba
+        $solicitud = \App\Models\AccessRequest::where('email', $request->email)->first();
+
+        if (!$solicitud || $solicitud->status !== 'approved') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tu acceso no ha sido aprobado o ha sido revocado.'
+            ], 403); // Error 403: Prohibido
         }
 
         $deviceName = $request->device_name ?? 'api-client';
