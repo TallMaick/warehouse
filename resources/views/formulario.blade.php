@@ -157,8 +157,28 @@
         <div class="form-container">
             <h2>Se Parte de Este Entorno</h2>
             <p>Complete el formulario y nuestro equipo de expertos en gestión agrícola se pondrá en contacto con usted.</p>
-            
-            <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Formulario enviado con éxito. Nos pondremos en contacto pronto.');">
+            <!-- Server Validation Messages -->
+            @if(session('success'))
+                <div class="server-alert alert-success">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="server-alert alert-danger">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Por favor, verifica los siguientes errores:
+                    </div>
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <form action="{{ route('solicitud.store') }}" method="POST">
                 @csrf
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
