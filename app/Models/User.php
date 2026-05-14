@@ -31,4 +31,10 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
         ];
     }
+
+    // Un usuario puede tener muchas fincas
+    public function fincas()
+    {
+        return $this->hasMany(Finca::class);
+    }
 }
