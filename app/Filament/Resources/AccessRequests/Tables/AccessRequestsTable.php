@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\Finca;
 
 class AccessRequestsTable
 {
@@ -58,7 +59,16 @@ class AccessRequestsTable
                     ->action(function (AccessRequest $record) {
                         $password = Str::random(8);
 
-                        User::firstOrCreate(
+                        // User::firstOrCreate(
+                        //     ['email' => $record->email],
+                        //     [
+                        //         'name' => $record->firstname . ' ' . $record->lastname,
+                        //         'password' => Hash::make($password),
+                        //     ]
+                        // );
+
+                        // 1. Guardamos el usuario creado en la variable $user
+                        $user = User::firstOrCreate(
                             ['email' => $record->email],
                             [
                                 'name' => $record->firstname . ' ' . $record->lastname,
@@ -66,11 +76,28 @@ class AccessRequestsTable
                             ]
                         );
 
+                        // 2. ¡LA MAGIA DEL DATA WAREHOUSE! Creamos la finca automáticamente
+                        Finca::create([
+                            'user_id' => $user->id,
+                            'nombre' => $record->landname, // Tomamos el nombre de la finca de la solicitud
+                        ]);
+
+                        // $record->update(['status' => 'approved']);
+
+                        // 3. Actualizamos el estado de la solicitud
                         $record->update(['status' => 'approved']);
 
+                        // Notification::make()
+                        //     ->title('Acceso Permitido Exitosamente')
+                        //     ->body("El usuario fue creado. Su contraseña para Flutter es: <strong>{$password}</strong>")
+                        //     ->success()
+                        //     ->persistent()
+                        //     ->send();
+
+                        // 4. Mostramos la notificación con el resumen completo
                         Notification::make()
                             ->title('Acceso Permitido Exitosamente')
-                            ->body("El usuario fue creado. Su contraseña para Flutter es: <strong>{$password}</strong>")
+                            ->body("El usuario y su finca (<strong>{$record->landname}</strong>) fueron creados. Contraseña para Flutter: <strong>{$password}</strong>")
                             ->success()
                             ->persistent()
                             ->send();
