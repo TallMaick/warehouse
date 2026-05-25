@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 
 class FincaResource extends Resource
@@ -48,5 +49,19 @@ class FincaResource extends Resource
             'create' => CreateFinca::route('/create'),
             'edit' => EditFinca::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        // Si NO es el superadmin, solo ve sus propias fincas
+        if (! $user->isSuperAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+
+        return $query;
     }
 }

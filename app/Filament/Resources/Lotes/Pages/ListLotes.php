@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Fincas\Pages;
+namespace App\Filament\Resources\Lotes\Pages;
 
-use App\Filament\Resources\Fincas\FincaResource;
+use App\Filament\Resources\Lotes\LoteResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\FincaResource\Widgets\EstadoFincasChart;
+use App\Filament\Resources\LoteResource\Widgets\CultivosLotesChart;
 
-class ListFincas extends ListRecords
+class ListLotes extends ListRecords
 {
-    protected static string $resource = FincaResource::class;
+    protected static string $resource = LoteResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -21,7 +21,7 @@ class ListFincas extends ListRecords
     protected function getFooterWidgets(): array
     {
         return [
-            EstadoFincasChart::class,
+            CultivosLotesChart::class,
         ];
     }
 }

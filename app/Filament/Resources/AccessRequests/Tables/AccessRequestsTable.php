@@ -59,7 +59,8 @@ class AccessRequestsTable
                     ->action(function (AccessRequest $record) {
                         $password = Str::random(8);
 
-                        // User::firstOrCreate(
+                        // // 1. Guardamos el usuario creado en la variable $user
+                        // $user = User::firstOrCreate(
                         //     ['email' => $record->email],
                         //     [
                         //         'name' => $record->firstname . ' ' . $record->lastname,
@@ -67,21 +68,45 @@ class AccessRequestsTable
                         //     ]
                         // );
 
-                        // 1. Guardamos el usuario creado en la variable $user
-                        $user = User::firstOrCreate(
-                            ['email' => $record->email],
+                        // // 1. Buscar al usuario o crearlo (solo con los datos básicos)
+                        // $user = User::firstOrCreate(
+                        //     ['email' => $record->email],
+                        //     ['name' => $record->firstname . ' ' . $record->lastname]
+                        // );
+
+                        // // 2. FORZAR la actualización de la contraseña (Rotación de credenciales de seguridad)
+                        // // Así garantizamos que la contraseña en pantalla sea la que realmente funciona
+                        // $user->update([
+                        //     'password' => Hash::make($password)
+                        // ]);
+
+                        $user = User::updateOrCreate(
+                            ['email' => $record->email], // Condición de búsqueda (El ID único del usuario)
                             [
                                 'name' => $record->firstname . ' ' . $record->lastname,
-                                'password' => Hash::make($password),
+                                'password' => Hash::make($password) // Genera o rota la credencial al instante
                             ]
                         );
 
-                        // 2. ¡LA MAGIA DEL DATA WAREHOUSE! Creamos la finca automáticamente
-                        Finca::create([
-                            'user_id' => $user->id,
-                            'nombre' => $record->landname, // Tomamos el nombre de la finca de la solicitud
-                        ]);
+                        // // 2. ¡LA MAGIA DEL DATA WAREHOUSE! Creamos la finca automáticamente
+                        // Finca::create([
+                        //     'user_id' => $user->id,
+                        //     'nombre' => $record->landname, // Tomamos el nombre de la finca de la solicitud
+                        // ]);
 
+                        // 🔒 MEDIDA DE SEGURIDAD: Revocar todos los tokens viejos si el usuario ya existía
+                        // Esto obliga a Flutter a pedir el nuevo login con la nueva contraseña
+                        $user->tokens()->delete();
+
+
+                        // 3. LA MAGIA ANTI-DUPLICADOS (Uso de firstOrCreate en Finca)
+                        // Le decimos: "Busca una finca de este usuario. Si no existe, créala."
+                        Finca::firstOrCreate(
+                            ['user_id' => $user->id], // Condición de búsqueda
+                            ['nombre' => $record->landname] // Datos para crearla si no la encuentra
+                        );
+
+                        
                         // $record->update(['status' => 'approved']);
 
                         // 3. Actualizamos el estado de la solicitud
@@ -128,6 +153,12 @@ class AccessRequestsTable
                     ->hidden(fn (AccessRequest $record) => $record->status === 'denied')
                     ->action(function (AccessRequest $record) {
                         $record->update(['status' => 'denied']);
+
+                        // 🔒 MEDIDA DE SEGURIDAD: Expulsar inmediatamente al usuario de la App Móvil
+                        $user = User::where('email', $record->email)->first();
+                        if ($user) {
+                            $user->tokens()->delete(); // Borra todos sus tokens de acceso activos
+                        }
 
                         Notification::make()
                             ->title('Solicitud denegada')

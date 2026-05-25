@@ -28,8 +28,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->font('Inter') // Tipografía principal de tu PDF
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#1B4D3E'), // Verde oscuro corporativo
+                'danger'  => Color::hex('#E85D04'), // Naranja para alertas y botones de "Detener"
+                'success' => Color::hex('#4CAF50'), // Verde claro para indicadores de éxito
+                'info'    => Color::hex('#0284C7'), // Azul para procesos y sincronización
+                'gray'    => Color::hex('#1E293B'), // Gris oscuro azulado para textos y fondos
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -55,5 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+            
+            
     }
 }

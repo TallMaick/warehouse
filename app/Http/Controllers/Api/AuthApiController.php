@@ -25,13 +25,6 @@ class AuthApiController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        //version anterior
-        // if (! $user || ! Hash::check($request->password, $user->password)) {
-        //     throw ValidationException::withMessages([
-        //         'email' => ['Las credenciales proporcionadas son incorrectas.'],
-        //     ]);
-        // }
-
         //version nueva
         // 1. Verificar credenciales básicas
         if (! $user || ! Hash::check($request->password, $user->password)) {
@@ -54,6 +47,12 @@ class AuthApiController extends Controller
 
         $deviceName = $request->device_name ?? 'api-client';
 
+        // $token = $user->createToken($deviceName)->plainTextToken;
+
+        // Eliminamos todos los tokens anteriores para forzar una única sesión activa
+        $user->tokens()->delete();
+
+        // Generamos el nuevo y único token válido
         $token = $user->createToken($deviceName)->plainTextToken;
 
         return response()->json([
