@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AccessRequests\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -18,7 +19,14 @@ class AccessRequestForm
                     ->schema([
                         TextInput::make('firstname')->label('Nombres'),
                         TextInput::make('lastname')->label('Apellidos'),
-                        TextInput::make('id_type')->label('Tipo Doc.'),
+                        Select::make('id_type') // Usa el nombre exacto de tu columna en la BD
+                            ->label('Tipo Doc.')
+                            ->options([
+                                'CC' => 'Cédula de Ciudadanía (CC)',
+                                'TI' => 'Tarjeta de Identidad (TI)',
+                                'Pasaporte' => 'Pasaporte',
+                            ]),
+                        // TextInput::make('id_type')->label('Tipo Doc.'),
                         TextInput::make('id_number')->label('Número Doc.'),
                         TextInput::make('email')->label('Correo Electrónico'),
                     ]),

@@ -37,4 +37,16 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Finca::class);
     }
+
+    /**
+     * Determina si este usuario es el dueño del sistema (Superadmin)
+     */
+    public function isSuperAdmin(): bool
+    {
+        // Puedes definirlo por el ID (ej. el primer usuario creado) 
+        // o por tu correo electrónico.
+        return $this->id === 1; 
+        
+        // Alternativa: return $this->email === 'tu_correo@gmail.com';
+    }
 }
