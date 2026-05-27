@@ -40,4 +40,13 @@ class AccessRequestResource extends Resource
             'index' => Pages\ListAccessRequests::route('/'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        
+        // Solo retorna TRUE (es decir, muestra el menú) si el usuario es el Superadmin
+        return $user->isSuperAdmin();
+    }
 }

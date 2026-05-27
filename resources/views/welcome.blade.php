@@ -15,7 +15,7 @@
 <body>
 
     <!-- Header -->
-    <header id="navbar">
+    {{-- <header id="navbar">
         <a href="{{ url('/') }}" class="logo">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 22 22 2 M22 22 2 2" opacity="0.2"/>
@@ -24,6 +24,25 @@
                 <path d="M6 16h12"/>
             </svg>
             Agro<span>Tech</span>
+        </a>
+    </header> --}}
+    <header id="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; transition: all 0.3s ease;">
+        <a href="{{ url('/') }}" class="logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 22 22 2 M22 22 2 2" opacity="0.2"/>
+                <path d="M12 2L2 22h20L12 2z"/>
+                <path d="M12 22V10"/>
+                <path d="M6 16h12"/>
+            </svg>
+            Agro<span>Tech</span>
+        </a>
+
+        <a href="{{ url('/sistema/login') }}" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.5rem; border-radius: 50px; padding: 0.5rem 1.25rem;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Ingresar
         </a>
     </header>
 
