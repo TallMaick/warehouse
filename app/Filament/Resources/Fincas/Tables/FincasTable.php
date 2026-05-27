@@ -35,7 +35,7 @@ class FincasTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 
-                // 🚀 NUEVA COLUMNA: Etiqueta visual de estado
+                // NUEVA COLUMNA: Etiqueta visual de estado
                 TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
@@ -51,7 +51,7 @@ class FincasTable
                 // Aquí agregaremos filtros más adelante
             ])
             ->actions([
-                // 🚀 NUEVO BOTÓN: Aprobar (Solo visible si está pendiente)
+                // NUEVO BOTÓN: Aprobar (Solo visible si está pendiente)
                 Action::make('aprobar')
                     ->label('Aprobar')
                     ->icon('heroicon-o-check-circle')
@@ -61,7 +61,7 @@ class FincasTable
                     ->action(fn ($record) => $record->update(['estado' => 'aprobado']))
                     ->visible(fn () => auth()->user()->isSuperAdmin()),
 
-                // 🚀 NUEVO BOTÓN: Rechazar (Solo visible si está pendiente)
+                // NUEVO BOTÓN: Rechazar (Solo visible si está pendiente)
                 Action::make('rechazar')
                     ->label('Rechazar')
                     ->icon('heroicon-o-x-circle')

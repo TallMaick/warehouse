@@ -10,6 +10,7 @@ class EstadoFincasChart extends ChartWidget
 {
     protected ?string $heading = 'Estado de Mis Fincas';
     protected ?string $maxHeight = '250px';
+    protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -43,6 +44,6 @@ class EstadoFincasChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'doughnut';
+        return 'bar';
     }
 }

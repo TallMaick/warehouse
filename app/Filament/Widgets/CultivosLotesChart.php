@@ -10,6 +10,7 @@ class CultivosLotesChart extends ChartWidget
 {
     protected ?string $heading = 'Hectáreas por Tipo de Cultivo';
     protected ?string $maxHeight = '250px';
+    protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -38,6 +39,6 @@ class CultivosLotesChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'line';
     }
 }

@@ -6,7 +6,6 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DateTimePicker;
-// use Filament\Forms\Get;
 use Filament\Schemas\Components\Utilities\Get;
 
 class LecturaIotForm
@@ -20,7 +19,7 @@ class LecturaIotForm
                     ->options(function () {
                         $query = \App\Models\Finca::query();
 
-                        // 🚀 CORRECCIÓN: Exigir que la finca esté aprobada
+                        //CORRECCIÓN: Exigir que la finca esté aprobada
                         $query->where('estado', 'aprobado');
                         
                         /** @var \App\Models\User $user */

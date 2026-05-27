@@ -14,10 +14,8 @@ class FincaApiController extends Controller
      */
     public function misFincas(Request $request): JsonResponse
     {
-        // // $request->user() obtiene al usuario gracias al Token de Sanctum
-        // $fincas = Finca::where('user_id', $request->user()->id)->get();
 
-        // 🚀 CLAVE: Filtramos para que Flutter solo reciba las fincas con luz verde
+        // CLAVE: Filtramos para que Flutter solo reciba las fincas con luz verde
         $fincas = $request->user()->fincas()->where('estado', 'aprobado')->get();
 
         return response()->json([
@@ -60,13 +58,6 @@ class FincaApiController extends Controller
                 'message' => 'No puedes modificar esta finca porque su estado actual es: ' . $finca->estado
             ], 403); // 403 = Prohibido
         }
-
-        // $finca->update([
-        //     'latitud'           => $request->latitud,
-        //     'longitud'          => $request->longitud,
-        //     'hectareas_totales' => $request->hectareas_totales,
-        //     'tipo_suelo'        => $request->tipo_suelo,
-        // ]);
         
         $finca->update($request->only([
             'nombre', 'latitud', 'longitud', 'hectareas_totales', 'tipo_suelo'

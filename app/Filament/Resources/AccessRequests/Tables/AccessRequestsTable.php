@@ -59,27 +59,6 @@ class AccessRequestsTable
                     ->action(function (AccessRequest $record) {
                         $password = Str::random(8);
 
-                        // // 1. Guardamos el usuario creado en la variable $user
-                        // $user = User::firstOrCreate(
-                        //     ['email' => $record->email],
-                        //     [
-                        //         'name' => $record->firstname . ' ' . $record->lastname,
-                        //         'password' => Hash::make($password),
-                        //     ]
-                        // );
-
-                        // // 1. Buscar al usuario o crearlo (solo con los datos básicos)
-                        // $user = User::firstOrCreate(
-                        //     ['email' => $record->email],
-                        //     ['name' => $record->firstname . ' ' . $record->lastname]
-                        // );
-
-                        // // 2. FORZAR la actualización de la contraseña (Rotación de credenciales de seguridad)
-                        // // Así garantizamos que la contraseña en pantalla sea la que realmente funciona
-                        // $user->update([
-                        //     'password' => Hash::make($password)
-                        // ]);
-
                         $user = User::updateOrCreate(
                             ['email' => $record->email], // Condición de búsqueda (El ID único del usuario)
                             [
@@ -88,13 +67,7 @@ class AccessRequestsTable
                             ]
                         );
 
-                        // // 2. ¡LA MAGIA DEL DATA WAREHOUSE! Creamos la finca automáticamente
-                        // Finca::create([
-                        //     'user_id' => $user->id,
-                        //     'nombre' => $record->landname, // Tomamos el nombre de la finca de la solicitud
-                        // ]);
-
-                        // 🔒 MEDIDA DE SEGURIDAD: Revocar todos los tokens viejos si el usuario ya existía
+                        //MEDIDA DE SEGURIDAD: Revocar todos los tokens viejos si el usuario ya existía
                         // Esto obliga a Flutter a pedir el nuevo login con la nueva contraseña
                         $user->tokens()->delete();
 
@@ -111,13 +84,6 @@ class AccessRequestsTable
 
                         // 3. Actualizamos el estado de la solicitud
                         $record->update(['status' => 'approved']);
-
-                        // Notification::make()
-                        //     ->title('Acceso Permitido Exitosamente')
-                        //     ->body("El usuario fue creado. Su contraseña para Flutter es: <strong>{$password}</strong>")
-                        //     ->success()
-                        //     ->persistent()
-                        //     ->send();
 
                         // 4. Mostramos la notificación con el resumen completo
                         Notification::make()

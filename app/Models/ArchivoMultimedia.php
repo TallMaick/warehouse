@@ -8,10 +8,6 @@ class ArchivoMultimedia extends Model
 {
     protected $table = 'archivos_multimedia';
     
-    // protected $fillable = [
-    //     'ruta_archivo',
-    //     'tipo_archivo',
-    // ];
 
     protected $fillable = [
         'fileable_type',   // Estándar de Laravel
@@ -19,7 +15,8 @@ class ArchivoMultimedia extends Model
         'contenido_texto',
         'ruta_archivo',
         'tipo_archivo',
-        'peso_bytes'
+        'peso_bytes',
+        'categoria', // 🚀 Añadimos la nueva columna aquí
     ];
 
     // Relación polimórfica principal

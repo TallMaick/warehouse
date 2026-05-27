@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class GastosPorActividadChart extends ChartWidget
 {
-    // 🚀 CORRECCIÓN AQUÍ: Le quitamos la palabra "static" a $heading
+    // CORRECCIÓN AQUÍ: Le quitamos la palabra "static" a $heading
     protected ?string $heading = 'Distribución de Inversión';
     
     // Esta línea sí mantiene el "static" porque es una regla de ordenamiento

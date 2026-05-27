@@ -18,7 +18,7 @@ class ListLecturaIots extends ListRecords
         ];
     }
 
-    // 🚀 NUEVO: Agregamos la gráfica al pie de la página
+    // NUEVO: Agregamos la gráfica al pie de la página
     protected function getFooterWidgets(): array
     {
         return [

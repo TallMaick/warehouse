@@ -10,6 +10,7 @@ class InversionMensualChart extends ChartWidget
 {
     protected ?string $heading = 'Inversión Mensual (Año Actual)';
     protected ?string $maxHeight = '250px';
+    protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {

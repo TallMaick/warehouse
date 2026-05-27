@@ -17,7 +17,7 @@ class FincaForm
         return $schema
             ->components([
                 // Relación con el Usuario (Propietario)
-                // 🚀 CORRECCIÓN: Condicional para el propietario
+                //CORRECCIÓN: Condicional para el propietario
                 $user->isSuperAdmin() 
                     ? Select::make('user_id')
                         ->relationship('user', 'name') 
@@ -32,7 +32,7 @@ class FincaForm
                     ->maxLength(255)
                     ->label('Nombre de la Finca'),
 
-                // 🚀 CORRECCIÓN: Separamos en Latitud y Longitud, alineados lado a lado
+                // CORRECCIÓN: Separamos en Latitud y Longitud, alineados lado a lado
                 Grid::make(2)->schema([
                     TextInput::make('latitud')
                         ->numeric()

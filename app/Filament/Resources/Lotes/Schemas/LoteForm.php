@@ -23,7 +23,7 @@ class LoteForm
                             /** @var \App\Models\User $user */
                             $user = auth()->user();
 
-                            // 🚀 CORRECCIÓN: Filtrar estrictamente para que la finca deba estar aprobada
+                            //CORRECCIÓN: Filtrar estrictamente para que la finca deba estar aprobada
                             $query->where('estado', 'aprobado');
 
                             // Si NO es el superadmin, filtramos para que solo salgan sus fincas

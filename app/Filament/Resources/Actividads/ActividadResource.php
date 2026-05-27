@@ -18,7 +18,6 @@ class ActividadResource extends Resource
 {
     protected static ?string $model = Actividad::class;
 
-    // 🚀 CORRECCIÓN VISUAL PARA FILAMENT V5
     protected static ?string $navigationLabel = 'Actividades'; // Nombre en el menú lateral
     protected static ?string $modelLabel = 'Actividad';         // Nombre en singular (ej: "Crear Actividad")
     protected static ?string $pluralModelLabel = 'Actividades';

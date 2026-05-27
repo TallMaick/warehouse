@@ -21,47 +21,7 @@ class MultimediaApiController extends Controller
             'modelo_id'   => 'required|integer' 
         ]);
 
-        // // 2. Mapear a qué modelo de Laravel pertenece
-        // $clasesPermitidas = [
-        //     'actividad' => \App\Models\Actividad::class,
-        //     'lote'      => \App\Models\Lote::class,
-        //     'finca'     => \App\Models\Finca::class,
-        // ];
-
-        // $claseDestino = $clasesPermitidas[$request->modelo_tipo];
-        // $entidad = $claseDestino::find($request->modelo_id);
-
-        // if (!$entidad) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'El registro destino no existe.'
-        //     ], 404);
-        // }
-
-        // $multimediaGuardada = []; // Lista para devolver las respuestas
-
-        // // 3. Recorremos CADA archivo (ya sea 1 solo, o sean 10)
-        // foreach ($request->file('archivos') as $archivo) {
-            
-        //     // Guardar en el disco duro
-        //     $rutaArchivo = $archivo->store('data_lake', 'public');
-        //     $tipoArchivo = $archivo->getClientOriginalExtension();
-
-        //     // Conectar a la base de datos
-        //     $multimedia = $entidad->archivos()->create([
-        //         'ruta_archivo' => $rutaArchivo, 
-        //         'tipo_archivo' => $tipoArchivo  
-        //     ]);
-
-        //     $multimediaGuardada[] = $multimedia; // Agregar a la lista de éxito
-        // }
-
-        // // 4. Devolver la confirmación final
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => count($multimediaGuardada) . ' archivo(s) multimedia guardado(s) exitosamente.',
-        //     'data'    => $multimediaGuardada
-        // ], 201);
+        
 
         if (!$request->hasFile('archivos') && !$request->filled('texto')) {
             return response()->json([
@@ -101,17 +61,7 @@ class MultimediaApiController extends Controller
         $entidad = $modeloClase::findOrFail($request->modelo_id);
         $archivosGuardados = [];
 
-        // foreach ($request->file('archivos') as $archivo) {
-        //     $path = $archivo->store('multimedia', 'public');
-
-        //     $archivosGuardados[] = \App\Models\ArchivoMultimedia::create([
-        //         'modelo_tipo' => $modeloClase,
-        //         'modelo_id'   => $entidad->id,
-        //         'ruta_archivo'=> $path,
-        //         'tipo_archivo'=> $archivo->getClientMimeType(),
-        //         'peso_bytes'  => $archivo->getSize(),
-        //     ]);
-        // }
+        
 
         // 5. Guardar Archivos (Usando fileable_type y fileable_id)
         if ($request->hasFile('archivos')) {

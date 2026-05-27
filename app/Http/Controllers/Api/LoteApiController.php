@@ -19,13 +19,7 @@ class LoteApiController extends Controller
                       ->where('user_id', $request->user()->id)
                       ->first();
 
-        // if (!$finca) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Finca no encontrada o acceso denegado.'
-        //     ], 404);
-        // }
-
+        // CLAVE: Validar que la finca esté aprobada antes de mostrar sus lotes
 
         if (!$finca || $finca->estado !== 'aprobado') {
             return response()->json([
@@ -64,12 +58,7 @@ class LoteApiController extends Controller
                       ->where('user_id', $request->user()->id)
                       ->first();
 
-        // if (!$finca) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Finca no encontrada o no tienes permisos.'
-        //     ], 404);
-        // }
+        // CLAVE: Validar que la finca esté aprobada antes de crear un lote en ella
 
         if (!$finca || $finca->estado !== 'aprobado') {
             return response()->json([

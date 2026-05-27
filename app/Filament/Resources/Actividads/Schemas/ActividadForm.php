@@ -7,7 +7,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
-// use Filament\Forms\Get;
 use Filament\Schemas\Components\Utilities\Get;
 
 class ActividadForm
@@ -21,7 +20,7 @@ class ActividadForm
                     ->options(function () {
                         $query = \App\Models\Finca::query();
 
-                        // 🚀 CORRECCIÓN: Exigir que la finca esté aprobada
+                        // CORRECCIÓN: Exigir que la finca esté aprobada
                         $query->where('estado', 'aprobado');
                         
                         /** @var \App\Models\User $user */
