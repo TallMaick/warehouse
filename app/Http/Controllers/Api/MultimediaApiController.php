@@ -9,28 +9,31 @@ use Illuminate\Http\JsonResponse;
 class MultimediaApiController extends Controller
 {
     /**
-     * Sube uno o múltiples archivos y los enlaza polimórficamente a un Lote, Finca o Actividad
+     * Guarda los registros de los archivos que Flutter ya subió a MinIO
+     * y los enlaza polimórficamente a un Lote, Finca o Actividad.
      */
     public function store(Request $request): JsonResponse
     {
-        // 1. Validar que venga el arreglo 'archivos', y validar las reglas de CADA archivo por dentro
+        // 1. Validar el JSON ligero (Ya no exigimos 'file', solo texto y arrays)
         $request->validate([
-            'archivos'    => 'required|array',
-            'archivos.*'  => 'required|file|mimes:jpg,jpeg,png,mp4,mov,avi,mp3,m4a,wav,pdf|max:51200', // Máx 50MB
             'modelo_tipo' => 'required|string|in:actividad,lote,finca', 
-            'modelo_id'   => 'required|integer' 
+            'modelo_id'   => 'required|integer',
+            'archivos_subidos' => 'nullable|array',
+            'archivos_subidos.*.ruta_archivo' => 'required_with:archivos_subidos|string',
+            'archivos_subidos.*.tipo_archivo' => 'required_with:archivos_subidos|string',
+            'archivos_subidos.*.peso_bytes'   => 'required_with:archivos_subidos|numeric',
+            'texto'       => 'nullable|string',
+            'categoria'   => 'nullable|string|in:seguimiento,enfermedad' // 🚀 Nueva columna añadida
         ]);
 
-        
-
-        if (!$request->hasFile('archivos') && !$request->filled('texto')) {
+        if (empty($request->archivos_subidos) && !$request->filled('texto')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Debes enviar al menos un archivo o una nota de texto.'
+                'message' => 'Debes enviar al menos los datos de un archivo o una nota de texto.'
             ], 400);
         }
 
-        // 1. RASTREO JERÁRQUICO: Averiguar a qué Finca pertenece este archivo
+        // 2. RASTREO JERÁRQUICO: Averiguar a qué Finca pertenece este archivo
         $finca = null;
 
         if ($request->modelo_tipo === 'finca') {
@@ -43,15 +46,15 @@ class MultimediaApiController extends Controller
             $finca = ($actividad && $actividad->lote) ? $actividad->lote->finca : null;
         }
 
-        // 2. CANDADO MAESTRO: Si la finca raíz no existe, no es del usuario o no está aprobada, se bloquea la subida
+        // 3. CANDADO MAESTRO: Seguridad
         if (!$finca || $finca->user_id !== $request->user()->id || $finca->estado !== 'aprobado') {
             return response()->json([
                 'success' => false,
-                'message' => 'Acceso denegado. No puedes subir archivos a una entidad asociada a una finca bloqueada o inexistente.'
+                'message' => 'Acceso denegado. Finca bloqueada o inexistente.'
             ], 403);
         }
 
-        // 3. Lógica original polimórfica para guardar el archivo si pasó la seguridad
+        // 4. Preparar el modelo polimórfico
         $modeloClase = match ($request->modelo_tipo) {
             'finca'     => \App\Models\Finca::class,
             'lote'      => \App\Models\Lote::class,
@@ -60,37 +63,36 @@ class MultimediaApiController extends Controller
 
         $entidad = $modeloClase::findOrFail($request->modelo_id);
         $archivosGuardados = [];
+        $categoria = $request->categoria ?? 'seguimiento';
 
-        
-
-        // 5. Guardar Archivos (Usando fileable_type y fileable_id)
-        if ($request->hasFile('archivos')) {
-            foreach ($request->file('archivos') as $archivo) {
-                $path = $archivo->store('multimedia', 'public');
-
+        // 5. Guardar Archivos en la Base de Datos (Flutter ya los subió a MinIO)
+        if (!empty($request->archivos_subidos)) {
+            foreach ($request->archivos_subidos as $archivo) {
                 $archivosGuardados[] = \App\Models\ArchivoMultimedia::create([
-                    'fileable_type' => $modeloClase,  // 🚀 Estándar de Laravel
-                    'fileable_id'   => $entidad->id,  // 🚀 Estándar de Laravel
-                    'ruta_archivo'  => $path,
-                    'tipo_archivo'  => $archivo->getClientMimeType(),
-                    'peso_bytes'    => $archivo->getSize(),
+                    'fileable_type' => $modeloClase,  
+                    'fileable_id'   => $entidad->id,  
+                    'ruta_archivo'  => $archivo['ruta_archivo'], // Flutter nos da la ruta final
+                    'tipo_archivo'  => $archivo['tipo_archivo'],
+                    'peso_bytes'    => $archivo['peso_bytes'],
+                    'categoria'     => $categoria,
                 ]);
             }
         }
 
-        // 6. Guardar Texto (Usando fileable_type y fileable_id)
+        // 6. Guardar Texto
         if ($request->filled('texto')) {
             $archivosGuardados[] = \App\Models\ArchivoMultimedia::create([
-                'fileable_type'   => $modeloClase,    // 🚀 Estándar de Laravel
-                'fileable_id'     => $entidad->id,    // 🚀 Estándar de Laravel
+                'fileable_type'   => $modeloClase,
+                'fileable_id'     => $entidad->id,
                 'contenido_texto' => $request->texto,
                 'tipo_archivo'    => 'nota_texto',
+                'categoria'       => $categoria,
             ]);
         }
 
         return response()->json([
             'success' => true,
-            'message' => count($archivosGuardados) . ' archivo(s) subido(s) correctamente.',
+            'message' => count($archivosGuardados) . ' registro(s) multimedia guardado(s) correctamente.',
             'data'    => $archivosGuardados
         ], 201);
     }
