@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\TranscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -12,7 +13,7 @@ class MultimediaApiController extends Controller
      * Guarda los registros de los archivos que Flutter ya subió a MinIO
      * y los enlaza polimórficamente a un Lote, Finca o Actividad.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, TranscriptionService $transcription): JsonResponse
     {
         // 1. Validar el JSON ligero (Ya no exigimos 'file', solo texto y arrays)
         $request->validate([
@@ -23,7 +24,7 @@ class MultimediaApiController extends Controller
             'archivos_subidos.*.tipo_archivo' => 'required_with:archivos_subidos|string',
             'archivos_subidos.*.peso_bytes'   => 'required_with:archivos_subidos|numeric',
             'texto'       => 'nullable|string',
-            'categoria'   => 'nullable|string|in:seguimiento,enfermedad' // 🚀 Nueva columna añadida
+            'categoria'   => 'nullable|string|in:seguimiento,enfermedad'
         ]);
 
         if (empty($request->archivos_subidos) && !$request->filled('texto')) {
@@ -64,23 +65,35 @@ class MultimediaApiController extends Controller
         $entidad = $modeloClase::findOrFail($request->modelo_id);
         $archivosGuardados = [];
         $categoria = $request->categoria ?? 'seguimiento';
+        $textoTranscrito = $request->texto;
 
         // 5. Guardar Archivos en la Base de Datos (Flutter ya los subió a MinIO)
         if (!empty($request->archivos_subidos)) {
             foreach ($request->archivos_subidos as $archivo) {
+                $esAudio = str_contains($archivo['tipo_archivo'], 'audio') || 
+                          str_contains($archivo['tipo_archivo'], 'nota_audio');
+                
+                $textoFinal = $textoTranscrito;
+
+                // Si es audio y no hay texto, intentar transcribir
+                if ($esAudio && empty($textoFinal)) {
+                    $textoFinal = $transcription->transcribeAudio($archivo['ruta_archivo']);
+                }
+
                 $archivosGuardados[] = \App\Models\ArchivoMultimedia::create([
                     'fileable_type' => $modeloClase,  
                     'fileable_id'   => $entidad->id,  
-                    'ruta_archivo'  => $archivo['ruta_archivo'], // Flutter nos da la ruta final
+                    'ruta_archivo'  => $archivo['ruta_archivo'],
                     'tipo_archivo'  => $archivo['tipo_archivo'],
                     'peso_bytes'    => $archivo['peso_bytes'],
                     'categoria'     => $categoria,
+                    'contenido_texto' => $textoFinal,
                 ]);
             }
         }
 
-        // 6. Guardar Texto
-        if ($request->filled('texto')) {
+        // 6. Guardar Texto (si no viene de transcripción de audio)
+        if ($request->filled('texto') && empty($request->archivos_subidos)) {
             $archivosGuardados[] = \App\Models\ArchivoMultimedia::create([
                 'fileable_type'   => $modeloClase,
                 'fileable_id'     => $entidad->id,

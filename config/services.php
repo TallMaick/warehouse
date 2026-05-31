@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'transcription' => [
+        'provider' => env('TRANSCRIPTION_PROVIDER', 'openai'),
+        'openai_api_key' => env('OPENAI_API_KEY'),
+        'google_api_key' => env('GOOGLE_SPEECH_API_KEY'),
+        'assembly_api_key' => env('ASSEMBLYAI_API_KEY'),
+    ],
+
 ];
