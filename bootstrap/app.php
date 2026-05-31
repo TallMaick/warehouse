@@ -13,8 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
-            \Illuminate\Http\Middleware\HandleCors::class,   
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class, //Se Asegura que las Apis puedan Ser "VistaS"
+            \Illuminate\Http\Middleware\HandleCors::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

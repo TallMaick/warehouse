@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\LoteApiController;
 use App\Http\Controllers\Api\ActividadApiController;
 use App\Http\Controllers\Api\MultimediaApiController;
 use App\Http\Controllers\Api\LecturaIotApiController;
+use App\Http\Controllers\Api\PresignedUrlController;
 
 // RUTA PÚBLICA (No requiere Token)
 // Aquí es donde Flutter envía el correo y la contraseña para obtener acceso.
@@ -24,6 +25,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthApiController::class, 'me']);
     Route::post('/logout', [AuthApiController::class, 'logout']);
     Route::post('/logout-all', [AuthApiController::class, 'logoutAll']);
+
+    // -- MinIO Presigned URL (para subida directa desde Flutter) --
+    Route::post('/minio/presigned-url', [PresignedUrlController::class, 'generate']);
 
     // -- Módulo de Producción Agrícola (Data Warehouse) --
     // Flutter pide el cascarón de la finca

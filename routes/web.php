@@ -11,5 +11,8 @@ Route::get('/formulario', function () {
     return view('formulario');
 });
 
-// Asumiendo que tu formulario está en la ruta raíz '/' o '/formulario'
+Route::get('/login', function () {
+    return response()->json(['message' => 'Unauthorized'], 401);
+})->name('login');
+
 Route::post('/solicitud', [FormController::class, 'store'])->name('solicitud.store');

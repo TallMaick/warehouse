@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ArchivoMultimedia extends Model
 {
@@ -23,5 +24,14 @@ class ArchivoMultimedia extends Model
     public function fileable()
     {
         return $this->morphTo();
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($archivo) {
+            if (!empty($archivo->ruta_archivo)) {
+                Storage::disk('s3')->delete($archivo->ruta_archivo);
+            }
+        });
     }
 }

@@ -72,11 +72,14 @@ class AccessRequestsTable
                         $user->tokens()->delete();
 
 
-                        // 3. LA MAGIA ANTI-DUPLICADOS (Uso de firstOrCreate en Finca)
-                        // Le decimos: "Busca una finca de este usuario. Si no existe, créala."
-                        Finca::firstOrCreate(
-                            ['user_id' => $user->id], // Condición de búsqueda
-                            ['nombre' => $record->landname] // Datos para crearla si no la encuentra
+                        // ACTUALIZAR O CREAR: Si la finca ya existe (pendiente), se aprueba.
+                        // Si no existe, se crea directamente aprobada.
+                        Finca::updateOrCreate(
+                            ['user_id' => $user->id],
+                            [
+                                'nombre' => $record->landname,
+                                'estado' => 'aprobado',
+                            ]
                         );
 
                         
