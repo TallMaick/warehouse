@@ -7,7 +7,7 @@ Plataforma AgroTech para captura de multimedia agricola (fotos, videos, audio, n
 - **Backend:** Laravel 13 + Sanctum (API REST) en `100.95.77.110:8080`
 - **Panel admin:** Filament 5
 - **App movil:** Flutter con Provider
-- **Almacenamiento:** MinIO (S3-compatible) en `100.95.77.110`
+- **Almacenamiento:** MinIO en `100.95.77.110`
 
 ## Requisitos
 
@@ -15,7 +15,7 @@ Plataforma AgroTech para captura de multimedia agricola (fotos, videos, audio, n
 - Composer
 - Node.js + npm
 - Flutter SDK >= 3.11
-- SQLite (o tu motor preferido)
+- SQLite
 
 ## Levantar el Backend
 
@@ -40,7 +40,7 @@ Plataforma AgroTech para captura de multimedia agricola (fotos, videos, audio, n
    php artisan serve
    ```
 
-## Levantar MinIO (desarrollo local)
+## Levantar MinIO
 
 ```
 docker compose -f docker-compose.minio.yml up -d
