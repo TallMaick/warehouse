@@ -1,4 +1,4 @@
-# AgroField
+# Agro Tech + Agro Field
 
 Plataforma AgroTech para captura de multimedia agricola (fotos, videos, audio, notas) vinculada a fincas, lotes y actividades.
 
