@@ -1,58 +1,123 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# AgroField
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plataforma AgroTech para captura de multimedia agricola (fotos, videos, audio, notas) vinculada a fincas, lotes y actividades.
 
-## About Laravel
+## Arquitectura
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend:** Laravel 13 + Sanctum (API REST) en `100.95.77.110:8080`
+- **Panel admin:** Filament 5
+- **App movil:** Flutter con Provider
+- **Almacenamiento:** MinIO (S3-compatible) en `100.95.77.110`
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requisitos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP >= 8.4
+- Composer
+- Node.js + npm
+- Flutter SDK >= 3.11
+- SQLite (o tu motor preferido)
 
-## Learning Laravel
+## Levantar el Backend
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clonar el repositorio
+2. Copiar y configurar el archivo de entorno:
+   ```
+   cp .env.example .env
+   ```
+3. Instalar dependencias:
+   ```
+   composer install
+   npm install
+   ```
+4. Generar clave de aplicacion y correr migraciones:
+   ```
+   php artisan key:generate
+   php artisan migrate
+   ```
+5. Configurar las variables de MinIO en `.env` (ver seccion Variables de Entorno)
+6. Iniciar el servidor:
+   ```
+   php artisan serve
+   ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Levantar MinIO (desarrollo local)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+docker compose -f docker-compose.minio.yml up -d
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Acceso al panel: `http://localhost:9001`
 
-## Contributing
+Crear un bucket y configurar las credenciales en `.env`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Levantar la App Flutter
 
-## Code of Conduct
+1. Ir al directorio del proyecto
+2. Instalar dependencias:
+   ```
+   flutter pub get
+   ```
+3. Ejecutar:
+   ```
+   flutter run
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+La app se conecta al servidor compartido en `http://100.95.77.110:8080/api`. Para cambiar la URL, editar `lib/config/app_config.dart`.
 
-## Security Vulnerabilities
+## Variables de Entorno
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Variable | Descripcion |
+|---|---|
+| `FILESYSTEM_DISK` | `s3` para usar MinIO |
+| `AWS_ENDPOINT` | URL de MinIO (ej: `http://100.95.77.110:9000`) |
+| `AWS_USE_PATH_STYLE_ENDPOINT` | `true` para MinIO |
+| `AWS_ACCESS_KEY_ID` | Credencial de MinIO |
+| `AWS_SECRET_ACCESS_KEY` | Credencial de MinIO |
+| `AWS_BUCKET` | Nombre del bucket |
 
-## License
+## Endpoints API
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Publicos
+- `POST /login` - Autenticacion (devuelve token Bearer)
+- `POST /iot/lecturas` - Datos de sensores IoT
+
+### Protegidos (auth:sanctum)
+- `GET /me` - Datos del usuario
+- `POST /logout` - Revocar token
+- `POST /logout-all` - Revocar todos los tokens
+- `GET /mis-fincas` - Fincas aprobadas del usuario
+- `POST /fincas/solicitar` - Solicitar nueva finca
+- `PUT /fincas/{id}/completar` - Completar datos de finca
+- `POST /fincas/{id}/multimedia` - Subir multimedia (archivo directo)
+- `GET /fincas/{id}/lotes` - Lotes de una finca
+- `POST /fincas/{id}/lotes` - Crear lote
+- `GET /lotes/{id}/actividades` - Historial de actividades
+- `POST /lotes/{id}/actividades` - Registrar actividad
+- `GET /lotes/{id}/lecturas` - Lecturas IoT de un lote
+- `POST /minio/presigned-url` - Obtener URL temporal para subida
+- `POST /multimedia/subir` - Registrar multimedia post-subida
+
+## Acceso al Panel Admin
+
+El panel Filament esta disponible en `/admin`. El superadmin es el usuario con `id = 1`.
+
+## Estructura del Proyecto
+
+```
+├── app/
+│   ├── Console/          # Comandos artisan
+│   ├── Filament/         # Panel admin (Resources, Widgets)
+│   ├── Http/Controllers/ # Controladores API y Web
+│   ├── Models/           # Modelos Eloquent
+│   └── Services/         # Servicios
+├── config/               # Configuracion Laravel
+├── database/migrations/  # Migraciones
+├── lib/                  # App Flutter
+│   ├── config/           # Configuracion de la app
+│   ├── models/           # Modelos locales
+│   ├── providers/        # State management (Provider)
+│   ├── screens/          # Pantallas
+│   └── services/         # Servicios (API, DB, Sync, Media, etc.)
+├── routes/               # Rutas API y Web
+└── docker-compose.minio.yml
+```
