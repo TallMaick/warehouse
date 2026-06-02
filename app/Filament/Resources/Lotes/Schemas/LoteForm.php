@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\Lotes\Schemas;
 
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,6 +14,9 @@ class LoteForm
 {
     public static function configure(Schema $schema): Schema
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         return $schema
             ->components([
                 Select::make('finca_id')
@@ -23,10 +27,8 @@ class LoteForm
                             /** @var \App\Models\User $user */
                             $user = auth()->user();
 
-                            //CORRECCIÓN: Filtrar estrictamente para que la finca deba estar aprobada
                             $query->where('estado', 'aprobado');
 
-                            // Si NO es el superadmin, filtramos para que solo salgan sus fincas
                             if (! $user->isSuperAdmin()) {
                                 $query->where('user_id', $user->id);
                             }
@@ -36,7 +38,7 @@ class LoteForm
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->columnSpanFull(), // Hace que este selector ocupe todo el ancho para destacar
+                    ->columnSpanFull(),
 
                 TextInput::make('nombre')
                     ->label('Nombre del Lote / Sector')
@@ -80,6 +82,18 @@ class LoteForm
                             ->numeric()
                             ->label('Longitud (Decimal)'),
                     ])->columns(2),
+
+                $user->isSuperAdmin()
+                    ? Select::make('estado')
+                        ->options([
+                            'pendiente' => 'Pendiente',
+                            'aprobado'  => 'Aprobado',
+                            'rechazado' => 'Rechazado',
+                        ])
+                        ->default('pendiente')
+                        ->label('Estado')
+                    : Hidden::make('estado')
+                        ->default('pendiente'),
             ]);
     }
 }

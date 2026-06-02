@@ -28,8 +28,8 @@ class LoteApiController extends Controller
             ], 403);
         }
 
-        // 2. Obtener los lotes
-        $lotes = $finca->lotes()->get();
+        // 2. Obtener solo los lotes aprobados
+        $lotes = $finca->lotes()->where('estado', 'aprobado')->get();
 
         return response()->json([
             'success' => true,
@@ -67,8 +67,9 @@ class LoteApiController extends Controller
             ], 403);
         }
 
-        // 3. Crear el lote en la base de datos
+        // 3. Crear el lote en la base de datos (nace como pendiente)
         $lote = $finca->lotes()->create([
+            'estado'        => 'pendiente',
             'nombre'        => $request->nombre,
             'hectareas'     => $request->hectareas,
             'tipo_cultivo'  => $request->tipo_cultivo,

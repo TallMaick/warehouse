@@ -8,10 +8,11 @@ class Lote extends Model
 {
     protected $fillable = [
         'finca_id',
+        'estado',
         'nombre',
         'hectareas',
-        'tipo_cultivo', // <-- Nueva
-        'variedad',     // <-- Nueva
+        'tipo_cultivo',
+        'variedad',
         'fecha_siembra',
         'latitud',
         'longitud',

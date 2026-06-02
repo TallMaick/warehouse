@@ -20,6 +20,12 @@ class ArchivoMultimediaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $navigationLabel = 'Archivos Multimedia';
+
+    protected static ?string $pluralModelLabel = 'Archivos Multimedia';
+
+    protected static ?string $modelLabel = 'Archivo Multimedia';
+
     public static function form(Schema $schema): Schema
     {
         return ArchivoMultimediaForm::configure($schema);
@@ -44,5 +50,10 @@ class ArchivoMultimediaResource extends Resource
             'create' => CreateArchivoMultimedia::route('/create'),
             'edit' => EditArchivoMultimedia::route('/{record}/edit'),
         ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->check() && auth()->user()->isSuperAdmin();
     }
 }
