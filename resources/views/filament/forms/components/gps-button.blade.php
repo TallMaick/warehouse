@@ -20,8 +20,8 @@
             this.lat = pos.coords.latitude.toFixed(8);
             this.lng = pos.coords.longitude.toFixed(8);
             
-            $wire.set('data.latitud', this.lat);
-            $wire.set('data.longitud', this.lng);
+            $wire.$set('data.latitud', this.lat);
+            $wire.$set('data.longitud', this.lng);
             
             $dispatch('notify', { 
                 status: 'success', 

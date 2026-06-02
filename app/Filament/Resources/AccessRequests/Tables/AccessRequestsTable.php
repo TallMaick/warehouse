@@ -70,11 +70,14 @@ class AccessRequestsTable
                         // Esto obliga a Flutter a pedir el nuevo login con la nueva contraseña
                         $user->tokens()->delete();
 
+                        // Crear la finca con el nombre proporcionado por el solicitante
+                        // Nace en estado 'pendiente' para que el usuario la complete y el admin la apruebe
+                        \App\Models\Finca::create([
+                            'user_id' => $user->id,
+                            'nombre'  => $record->landname,
+                            'estado'  => 'pendiente',
+                        ]);
 
-                        // Ya NO se crea la finca automáticamente.
-                        // El usuario deberá crearla desde el panel y el admin la aprobará por separado.
-
-                        
                         // $record->update(['status' => 'approved']);
 
                         // 3. Actualizamos el estado de la solicitud
@@ -83,7 +86,7 @@ class AccessRequestsTable
                         // 4. Mostramos la notificación con el resumen completo
                         Notification::make()
                             ->title('Acceso Permitido Exitosamente')
-                            ->body("El usuario <strong>{$record->firstname} {$record->lastname}</strong> fue creado. Contraseña para Flutter: <strong>{$password}</strong>")
+                            ->body("El usuario <strong>{$record->firstname} {$record->lastname}</strong> fue creado. Se creó la finca <strong>{$record->landname}</strong> en estado pendiente. Contraseña para Flutter: <strong>{$password}</strong>")
                             ->success()
                             ->persistent()
                             ->send();
