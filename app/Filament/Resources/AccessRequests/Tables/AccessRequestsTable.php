@@ -13,7 +13,6 @@ use Filament\Tables\Table;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use App\Models\Finca;
 
 class AccessRequestsTable
 {
@@ -71,18 +70,14 @@ class AccessRequestsTable
                         // Esto obliga a Flutter a pedir el nuevo login con la nueva contraseña
                         $user->tokens()->delete();
 
+                        // Crear la finca con el nombre proporcionado por el solicitante
+                        // Nace en estado 'pendiente' para que el usuario la complete y el admin la apruebe
+                        \App\Models\Finca::create([
+                            'user_id' => $user->id,
+                            'nombre'  => $record->landname,
+                            'estado'  => 'pendiente',
+                        ]);
 
-                        // ACTUALIZAR O CREAR: Si la finca ya existe (pendiente), se aprueba.
-                        // Si no existe, se crea directamente aprobada.
-                        Finca::updateOrCreate(
-                            ['user_id' => $user->id],
-                            [
-                                'nombre' => $record->landname,
-                                'estado' => 'aprobado',
-                            ]
-                        );
-
-                        
                         // $record->update(['status' => 'approved']);
 
                         // 3. Actualizamos el estado de la solicitud
@@ -91,7 +86,7 @@ class AccessRequestsTable
                         // 4. Mostramos la notificación con el resumen completo
                         Notification::make()
                             ->title('Acceso Permitido Exitosamente')
-                            ->body("El usuario y su finca (<strong>{$record->landname}</strong>) fueron creados. Contraseña para Flutter: <strong>{$password}</strong>")
+                            ->body("El usuario <strong>{$record->firstname} {$record->lastname}</strong> fue creado. Se creó la finca <strong>{$record->landname}</strong> en estado pendiente. Contraseña para Flutter: <strong>{$password}</strong>")
                             ->success()
                             ->persistent()
                             ->send();

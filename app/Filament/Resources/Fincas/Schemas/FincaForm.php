@@ -32,18 +32,23 @@ class FincaForm
                     ->maxLength(255)
                     ->label('Nombre de la Finca'),
 
-                // CORRECCIÓN: Separamos en Latitud y Longitud, alineados lado a lado
+                // Coordenadas GPS con captura automática
                 Grid::make(2)->schema([
                     TextInput::make('latitud')
                         ->numeric()
                         ->label('Latitud')
-                        ->placeholder('Ej: 8.2435'),
+                        ->placeholder('Automático'),
                         
                     TextInput::make('longitud')
                         ->numeric()
                         ->label('Longitud')
-                        ->placeholder('Ej: -73.3521'),
+                        ->placeholder('Automático'),
                 ]),
+
+                // Botón para obtener ubicación GPS
+                \Filament\Forms\Components\ViewField::make('gps_button')
+                    ->view('filament.forms.components.gps-button')
+                    ->dehydrated(false),
 
                 TextInput::make('hectareas_totales')
                     ->numeric()
