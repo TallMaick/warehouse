@@ -251,6 +251,9 @@ class _CaptureScreenState extends State<CaptureScreen> {
               await _audioPlayer.stop();
               setState(() => _isPlaying = false);
             } else {
+              _audioPlayer.onPlayerComplete.listen((_) {
+                if (mounted) setState(() => _isPlaying = false);
+              });
               await _audioPlayer.play(DeviceFileSource(_capturedFile!.path));
               setState(() => _isPlaying = true);
             }

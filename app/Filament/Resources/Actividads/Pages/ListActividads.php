@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Actividads\Pages;
 use App\Filament\Resources\Actividads\ActividadResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\ActividadResource\Widgets\InversionMensualChart;
+use App\Filament\Widgets\InversionMensualChart;
 
 class ListActividads extends ListRecords
 {

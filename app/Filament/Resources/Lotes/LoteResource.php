@@ -51,10 +51,9 @@ class LoteResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $query = parent::getEloquentQuery();
-        /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (! $user->isSuperAdmin()) {
+        if (! $user?->isSuperAdmin()) {
             // Entra al Lote -> Finca -> verifica el dueño
             $query->whereHas('finca', function ($q) use ($user) {
                 $q->where('user_id', $user->id);

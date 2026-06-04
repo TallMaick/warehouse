@@ -121,7 +121,7 @@ class LoteApiController extends Controller
 
         $lote = Lote::with('finca')->where('id', $lote_id)->first();
 
-        if (!$lote || $lote->finca->user_id !== $request->user()->id) {
+        if (!$lote || !$lote->finca || $lote->finca->user_id !== $request->user()->id || $lote->finca->estado !== 'aprobado') {
             return response()->json([
                 'success' => false,
                 'message' => 'Lote no encontrado o acceso denegado.'

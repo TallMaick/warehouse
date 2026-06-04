@@ -92,11 +92,6 @@ class Lote extends Model
         return $this->morphMany(ArchivoMultimedia::class, 'fileable');
     }
 
-    public function lotes()
-    {
-        return $this->hasMany(Lote::class);
-    }
-
     public function actividades()
     {
         return $this->hasMany(Actividad::class);

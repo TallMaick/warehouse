@@ -59,22 +59,23 @@ class SyncService {
     _totalCount = toProcess.length;
 
     for (final item in toProcess) {
-      await _processItem(item);
-      _syncedCount++;
+      final success = await _processItem(item);
+      if (success) {
+        _syncedCount++;
+      }
     }
 
     await updatePendingCount();
     _isSyncing = false;
   }
 
-  Future<void> _processItem(MediaCapture item) async {
+  Future<bool> _processItem(MediaCapture item) async {
     try {
       item.syncStatus = SyncStatus.uploading;
       await _updateMedia(item);
 
       if (item.tipo == MediaType.textNote) {
-        await _processTextNote(item);
-        return;
+        return await _processTextNote(item);
       }
 
       if (item.localPath != null && File(item.localPath!).existsSync()) {
@@ -83,7 +84,7 @@ class SyncService {
 
         if (modeloId == null) {
           await _markFailed(item, 'No se encontro la entidad asociada');
-          return;
+          return false;
         }
 
         final uploadResult = await _minio.uploadToMinio(
@@ -95,7 +96,7 @@ class SyncService {
 
         if (uploadResult == null) {
           await _markFailed(item, 'Error al subir a MinIO');
-          return;
+          return false;
         }
 
         final registered = await _minio.registerInApi(
@@ -108,7 +109,7 @@ class SyncService {
 
         if (!registered) {
           await _markFailed(item, 'Error al registrar en la API');
-          return;
+          return false;
         }
 
         item.syncStatus = SyncStatus.synced;
@@ -119,21 +120,24 @@ class SyncService {
         if (await localFile.exists()) {
           await localFile.delete();
         }
+        return true;
       } else {
         await _markFailed(item, 'Archivo local no encontrado');
+        return false;
       }
     } catch (e) {
       await _markFailed(item, e.toString());
+      return false;
     }
   }
 
-  Future<void> _processTextNote(MediaCapture item) async {
+  Future<bool> _processTextNote(MediaCapture item) async {
     final modeloTipo = _getModeloTipo(item);
     final modeloId = _getModeloId(item);
 
     if (modeloId == null) {
       await _markFailed(item, 'No se encontro la entidad asociada');
-      return;
+      return false;
     }
 
     final registered = await _minio.registerTextNote(
@@ -145,11 +149,12 @@ class SyncService {
 
     if (!registered) {
       await _markFailed(item, 'Error al registrar nota de texto en la API');
-      return;
+      return false;
     }
 
     item.syncStatus = SyncStatus.synced;
     await _updateMedia(item);
+    return true;
   }
 
   Future<void> _markFailed(MediaCapture item, String error) async {

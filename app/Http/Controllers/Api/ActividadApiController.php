@@ -32,11 +32,11 @@ class ActividadApiController extends Controller
             ], 404);
         }
 
-        // 3. Validar que el lote esté disponible para registrar actividades
-        if ($lote->estado !== 'disponible') {
+        // 3. Validar que el lote permita registrar actividades
+        if (!in_array($lote->estado, ['disponible', 'en_uso'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'El lote no está disponible. Cambia su estado a "disponible" para registrar actividades.'
+                'message' => 'El lote no permite registrar actividades. Estado actual: ' . $lote->estado
             ], 403);
         }
 
