@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Lotes\Schemas;
 
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
@@ -38,6 +37,7 @@ class LoteForm
                     ->searchable()
                     ->preload()
                     ->required()
+                    ->live()
                     ->columnSpanFull(),
 
                 TextInput::make('nombre')
@@ -67,7 +67,30 @@ class LoteForm
                     ->label('Hectáreas')
                     ->numeric()
                     ->required()
-                    ->minValue(0.01),
+                    ->minValue(0.01)
+                    ->rules([
+                        function (callable $get, $record) {
+                            return function (string $attribute, $value, callable $fail) use ($get, $record) {
+                                $fincaId = $get('finca_id');
+                                if (!$fincaId) {
+                                    $fail('Selecciona una finca primero.');
+                                    return;
+                                }
+
+                                $finca = \App\Models\Finca::find($fincaId);
+                                if (!$finca || $finca->hectareas_totales === null) {
+                                    $fail('La finca no tiene hectáreas totales definidas.');
+                                    return;
+                                }
+
+                                $excludeId = $record?->id;
+                                if (!$finca->tieneEspacioDisponible((float) $value, $excludeId)) {
+                                    $disponible = number_format($finca->hectareasDisponibles($excludeId), 2);
+                                    $fail("Solo quedan {$disponible} hectáreas disponibles en la finca.");
+                                }
+                            };
+                        },
+                    ]),
 
                 DatePicker::make('fecha_siembra')
                     ->label('Fecha de Siembra')
@@ -83,17 +106,14 @@ class LoteForm
                             ->label('Longitud (Decimal)'),
                     ])->columns(2),
 
-                $user->isSuperAdmin()
-                    ? Select::make('estado')
-                        ->options([
-                            'pendiente' => 'Pendiente',
-                            'aprobado'  => 'Aprobado',
-                            'rechazado' => 'Rechazado',
-                        ])
-                        ->default('pendiente')
-                        ->label('Estado')
-                    : Hidden::make('estado')
-                        ->default('pendiente'),
+                Select::make('estado')
+                    ->options([
+                        'disponible'    => 'Disponible',
+                        'en_uso'        => 'En uso',
+                        'no_disponible' => 'No disponible',
+                    ])
+                    ->default('disponible')
+                    ->label('Estado'),
             ]);
     }
 }

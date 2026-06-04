@@ -84,6 +84,16 @@ class ApiService {
     return response.data['data'] as List;
   }
 
+  Future<Map<String, dynamic>> updateLoteEstado({
+    required int loteId,
+    required String estado,
+  }) async {
+    final response = await _dio.patch('/lotes/$loteId/estado', data: {
+      'estado': estado,
+    });
+    return response.data;
+  }
+
   Future<Map<String, dynamic>> getPresignedUrl({
     required String modeloTipo,
     required int modeloId,
@@ -114,6 +124,22 @@ class ApiService {
       'modelo_id': modeloId,
       'archivos_subidos': archivosSubidos,
       if (texto != null) 'texto': texto,
+      if (categoria != null) 'categoria': categoria,
+    };
+    final response = await _dio.post('/multimedia/subir', data: data);
+    return response.data;
+  }
+
+  Future<Map<String, dynamic>> registerMultimediaTextNote({
+    required String modeloTipo,
+    required int modeloId,
+    required String texto,
+    String? categoria,
+  }) async {
+    final data = {
+      'modelo_tipo': modeloTipo,
+      'modelo_id': modeloId,
+      'texto': texto,
       if (categoria != null) 'categoria': categoria,
     };
     final response = await _dio.post('/multimedia/subir', data: data);

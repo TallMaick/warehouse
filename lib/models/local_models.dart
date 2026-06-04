@@ -57,6 +57,7 @@ class LoteLocal {
   String? fechaSiembra;
   String? latitud;
   String? longitud;
+  String? estado;
 
   LoteLocal({
     this.id,
@@ -69,6 +70,7 @@ class LoteLocal {
     this.fechaSiembra,
     this.latitud,
     this.longitud,
+    this.estado,
   });
 
   Map<String, dynamic> toMap() {
@@ -83,6 +85,7 @@ class LoteLocal {
       'fechaSiembra': fechaSiembra,
       'latitud': latitud,
       'longitud': longitud,
+      'estado': estado,
     };
   }
 
@@ -98,6 +101,7 @@ class LoteLocal {
       fechaSiembra: map['fechaSiembra'] as String?,
       latitud: map['latitud'] as String?,
       longitud: map['longitud'] as String?,
+      estado: map['estado'] as String?,
     );
   }
 }

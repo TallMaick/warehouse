@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Finca;
+use App\Models\Lote;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -28,8 +29,8 @@ class LoteApiController extends Controller
             ], 403);
         }
 
-        // 2. Obtener solo los lotes aprobados
-        $lotes = $finca->lotes()->where('estado', 'aprobado')->get();
+        // 2. Obtener los lotes de la finca
+        $lotes = $finca->lotes()->get();
 
         return response()->json([
             'success' => true,
@@ -67,9 +68,32 @@ class LoteApiController extends Controller
             ], 403);
         }
 
-        // 3. Crear el lote en la base de datos (nace como pendiente)
+        // Validar que la finca tenga hectáreas totales definidas
+        if ($finca->hectareas_totales === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pueden crear lotes. La finca no tiene hectáreas totales definidas.'
+            ], 400);
+        }
+
+        // Validar que haya espacio disponible
+        $hectareasOcupadas = $finca->lotes()->sum('hectareas');
+        $hectareasDisponibles = $finca->hectareas_totales - $hectareasOcupadas;
+
+        if ($request->hectareas > $hectareasDisponibles) {
+            return response()->json([
+                'success' => false,
+                'message' => sprintf(
+                    'No hay suficiente espacio. El lote requiere %s hectáreas pero solo quedan %s disponibles.',
+                    number_format($request->hectareas, 2),
+                    number_format($hectareasDisponibles, 2)
+                )
+            ], 400);
+        }
+
+        // 3. Crear el lote en la base de datos (nace como disponible)
         $lote = $finca->lotes()->create([
-            'estado'        => 'pendiente',
+            'estado'        => 'disponible',
             'nombre'        => $request->nombre,
             'hectareas'     => $request->hectareas,
             'tipo_cultivo'  => $request->tipo_cultivo,
@@ -84,5 +108,32 @@ class LoteApiController extends Controller
             'message' => 'Lote creado exitosamente desde el campo',
             'data'    => $lote
         ], 201);
+    }
+
+    /**
+     * Permite al agricultor cambiar el estado de un lote (disponible, en_uso, no_disponible)
+     */
+    public function updateEstado(Request $request, $lote_id): JsonResponse
+    {
+        $request->validate([
+            'estado' => 'required|in:disponible,en_uso,no_disponible',
+        ]);
+
+        $lote = Lote::with('finca')->where('id', $lote_id)->first();
+
+        if (!$lote || $lote->finca->user_id !== $request->user()->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lote no encontrado o acceso denegado.'
+            ], 404);
+        }
+
+        $lote->update(['estado' => $request->estado]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado del lote actualizado correctamente.',
+            'data'    => $lote
+        ], 200);
     }
 }

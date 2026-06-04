@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 class Lote extends Model
 {
@@ -18,31 +19,89 @@ class Lote extends Model
         'longitud',
     ];
 
-    // Relación Inversa: Un lote pertenece a una finca
+    public const ESTADOS = [
+        'disponible',
+        'en_uso',
+        'no_disponible',
+    ];
+
+    protected static function booted()
+    {
+        static::creating(function ($lote) {
+            $finca = $lote->finca;
+            if ($finca === null) {
+                throw ValidationException::withMessages([
+                    'finca_id' => 'La finca especificada no existe.'
+                ]);
+            }
+
+            if ($finca->hectareas_totales === null) {
+                throw ValidationException::withMessages([
+                    'hectareas' => 'No se pueden crear lotes. La finca no tiene hectáreas totales definidas.'
+                ]);
+            }
+
+            if (!$finca->tieneEspacioDisponible($lote->hectareas)) {
+                $disponible = number_format($finca->hectareasDisponibles(), 2);
+                throw ValidationException::withMessages([
+                    'hectareas' => "Solo quedan {$disponible} hectáreas disponibles en la finca."
+                ]);
+            }
+        });
+
+        static::updating(function ($lote) {
+            if ($lote->isDirty('hectareas') || $lote->isDirty('finca_id')) {
+                $finca = Finca::find($lote->finca_id);
+
+                if ($finca === null) {
+                    throw ValidationException::withMessages([
+                        'finca_id' => 'La finca especificada no existe.'
+                    ]);
+                }
+
+                if ($finca->hectareas_totales === null) {
+                    throw ValidationException::withMessages([
+                        'hectareas' => 'No se pueden crear lotes. La finca no tiene hectáreas totales definidas.'
+                    ]);
+                }
+
+                $hectareas = $lote->isDirty('hectareas') ? $lote->hectareas : $lote->getOriginal('hectareas');
+
+                if (!$finca->tieneEspacioDisponible($hectareas, $lote->id)) {
+                    $disponible = number_format($finca->hectareasDisponibles($lote->id), 2);
+                    throw ValidationException::withMessages([
+                        'hectareas' => "Solo quedan {$disponible} hectáreas disponibles en la finca."
+                    ]);
+                }
+            }
+        });
+    }
+
+    public function scopeDisponibles($query)
+    {
+        return $query->where('estado', 'disponible');
+    }
+
     public function finca()
     {
         return $this->belongsTo(Finca::class);
     }
 
-    // ¡Conexión al Data Lake! Un lote puede recibir fotos de plagas o audios
     public function archivos()
     {
         return $this->morphMany(ArchivoMultimedia::class, 'fileable');
     }
 
-    // Relación Directa: Una finca tiene muchos lotes
     public function lotes()
     {
         return $this->hasMany(Lote::class);
     }
 
-    // Relación Directa: Un lote tiene muchas actividades agrícolas
     public function actividades()
     {
         return $this->hasMany(Actividad::class);
     }
 
-    // Relación: Un Lote tiene muchas lecturas de sensores IoT
     public function lecturasIot()
     {
         return $this->hasMany(LecturaIot::class);

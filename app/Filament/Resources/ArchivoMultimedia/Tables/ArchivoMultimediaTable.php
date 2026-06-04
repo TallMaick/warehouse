@@ -117,6 +117,7 @@ class ArchivoMultimediaTable
                     ->label('Usuario (Finca)')
                     ->options(fn (): array => User::pluck('name', 'id')->toArray())
                     ->searchable()
+                    ->visible(fn (): bool => auth()->user()?->isSuperAdmin() ?? false)
                     ->query(function ($query, array $data) {
                         if (!$data['value']) return $query;
                         return $query->where(function ($q) use ($data) {

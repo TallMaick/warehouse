@@ -24,10 +24,15 @@ class ActividadsTable
                     ->label('Actividad')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Fertilizacion' => 'success',
-                        'Control Plagas' => 'danger',
-                        'Cosecha' => 'warning',
-                        default => 'gray',
+                        'fertilizacion'  => 'success',
+                        'control_plagas' => 'danger',
+                        'cosecha'        => 'warning',
+                        'siembra'        => 'info',
+                        'riego'          => 'primary',
+                        'poda'           => 'warning',
+                        'preparacion'    => 'gray',
+                        'mantenimiento'  => 'gray',
+                        default          => 'gray',
                     })
                     ->sortable()
                     ->searchable(),
@@ -46,11 +51,14 @@ class ActividadsTable
                 SelectFilter::make('tipo_actividad')
                     ->label('Filtrar por Tipo')
                     ->options([
-                        'Fertilizacion' => 'Fertilización',
-                        'Poda' => 'Poda',
-                        'Control Plagas' => 'Control de Plagas',
-                        'Cosecha' => 'Cosecha',
-                        'Riego' => 'Riego',
+                        'preparacion'    => 'Preparación del Terreno',
+                        'siembra'        => 'Siembra',
+                        'fertilizacion'  => 'Fertilización',
+                        'riego'          => 'Riego',
+                        'control_plagas' => 'Control de Plagas y Enfermedades',
+                        'poda'           => 'Poda',
+                        'cosecha'        => 'Cosecha',
+                        'mantenimiento'  => 'Mantenimiento General',
                     ]),
             ])
             ->recordActions([

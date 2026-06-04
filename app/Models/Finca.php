@@ -22,15 +22,45 @@ class Finca extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Una finca puede tener MUCHOS archivos en el Data Lake (Fotos, audios)
     public function archivos()
     {
         return $this->morphMany(ArchivoMultimedia::class, 'fileable');
     }
 
-    // Relación Directa: Una finca tiene muchos lotes
     public function lotes()
     {
         return $this->hasMany(Lote::class);
+    }
+
+    public function tieneEspacioDisponible(float $hectareas, ?int $excludeLoteId = null): bool
+    {
+        if ($this->hectareas_totales === null) {
+            return false;
+        }
+
+        $query = $this->lotes();
+        if ($excludeLoteId !== null) {
+            $query->where('id', '!=', $excludeLoteId);
+        }
+
+        $hectareasOcupadas = $query->sum('hectareas');
+
+        return ($hectareasOcupadas + $hectareas) <= $this->hectareas_totales;
+    }
+
+    public function hectareasDisponibles(?int $excludeLoteId = null): float
+    {
+        if ($this->hectareas_totales === null) {
+            return 0;
+        }
+
+        $query = $this->lotes();
+        if ($excludeLoteId !== null) {
+            $query->where('id', '!=', $excludeLoteId);
+        }
+
+        $hectareasOcupadas = $query->sum('hectareas');
+
+        return max(0, $this->hectareas_totales - $hectareasOcupadas);
     }
 }

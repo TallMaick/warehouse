@@ -81,10 +81,29 @@ class MinioService {
     }
   }
 
+  Future<bool> registerTextNote({
+    required String modeloTipo,
+    required int modeloId,
+    required String texto,
+    String? categoria,
+  }) async {
+    try {
+      await _api.registerMultimediaTextNote(
+        modeloTipo: modeloTipo,
+        modeloId: modeloId,
+        texto: texto,
+        categoria: categoria,
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   String _guessTipoArchivo(String mimeType) {
-    if (mimeType.startsWith('image/')) return 'foto_campo';
-    if (mimeType.startsWith('video/')) return 'video_campo';
-    if (mimeType.startsWith('audio/')) return 'nota_audio';
-    return 'archivo_campo';
+    if (mimeType.startsWith('image/')) return 'foto';
+    if (mimeType.startsWith('video/')) return 'video';
+    if (mimeType.startsWith('audio/')) return 'audio';
+    return 'archivo';
   }
 }

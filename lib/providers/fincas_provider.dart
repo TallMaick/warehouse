@@ -76,6 +76,7 @@ class FincasProvider extends ChangeNotifier {
           fechaSiembra: l['fecha_siembra'],
           latitud: l['latitud']?.toString(),
           longitud: l['longitud']?.toString(),
+          estado: l['estado'] ?? 'disponible',
         );
         await database.insert('lotes', lote.toMap());
       }
