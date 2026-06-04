@@ -32,7 +32,15 @@ class ActividadApiController extends Controller
             ], 404);
         }
 
-        // 3. Crear la actividad en la base de datos
+        // 3. Validar que el lote esté disponible para registrar actividades
+        if ($lote->estado !== 'disponible') {
+            return response()->json([
+                'success' => false,
+                'message' => 'El lote no está disponible. Cambia su estado a "disponible" para registrar actividades.'
+            ], 403);
+        }
+
+        // 4. Crear la actividad en la base de datos
         $actividad = $lote->actividades()->create([
             'tipo_actividad' => $request->tipo_actividad,
             'fecha'          => $request->fecha,

@@ -70,8 +70,7 @@ class MultimediaApiController extends Controller
         // 5. Guardar Archivos en la Base de Datos (Flutter ya los subió a MinIO)
         if (!empty($request->archivos_subidos)) {
             foreach ($request->archivos_subidos as $archivo) {
-                $esAudio = str_contains($archivo['tipo_archivo'], 'audio') || 
-                          str_contains($archivo['tipo_archivo'], 'nota_audio');
+                $esAudio = in_array($archivo['tipo_archivo'], ['audio', 'nota_audio']);
                 
                 $textoFinal = $textoTranscrito;
 

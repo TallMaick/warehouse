@@ -47,6 +47,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/fincas/{finca_id}/lotes', [LoteApiController::class, 'index']);
     // Flutter envía los datos del nuevo lote (nombre, hectáreas, cultivo, etc.)
     Route::post('/fincas/{finca_id}/lotes', [LoteApiController::class, 'store']);
+    // Flutter cambia el estado de un lote (disponible, en_uso, no_disponible)
+    Route::patch('/lotes/{lote_id}/estado', [LoteApiController::class, 'updateEstado']);
     // Flutter solicita las actividades de un lote para mostrar en el dashboard
     Route::get('/lotes/{lote_id}/actividades', [ActividadApiController::class, 'index']); 
     // Flutter envía los datos de la nueva actividad (nombre, fecha, descripción, etc.)

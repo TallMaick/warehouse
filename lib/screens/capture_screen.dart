@@ -158,6 +158,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
       fincaRemoteId: widget.fincaId,
       loteRemoteId: widget.loteId,
       categoria: _categoria,
+      pesoBytes: text.length,
       createdAt: DateTime.now(),
       syncStatus: SyncStatus.pending,
     );

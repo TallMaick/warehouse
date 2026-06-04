@@ -72,6 +72,11 @@ class SyncService {
       item.syncStatus = SyncStatus.uploading;
       await _updateMedia(item);
 
+      if (item.tipo == MediaType.textNote) {
+        await _processTextNote(item);
+        return;
+      }
+
       if (item.localPath != null && File(item.localPath!).existsSync()) {
         final modeloTipo = _getModeloTipo(item);
         final modeloId = _getModeloId(item);
@@ -120,6 +125,31 @@ class SyncService {
     } catch (e) {
       await _markFailed(item, e.toString());
     }
+  }
+
+  Future<void> _processTextNote(MediaCapture item) async {
+    final modeloTipo = _getModeloTipo(item);
+    final modeloId = _getModeloId(item);
+
+    if (modeloId == null) {
+      await _markFailed(item, 'No se encontro la entidad asociada');
+      return;
+    }
+
+    final registered = await _minio.registerTextNote(
+      modeloTipo: modeloTipo,
+      modeloId: modeloId,
+      texto: item.transcribedText ?? '',
+      categoria: item.categoria,
+    );
+
+    if (!registered) {
+      await _markFailed(item, 'Error al registrar nota de texto en la API');
+      return;
+    }
+
+    item.syncStatus = SyncStatus.synced;
+    await _updateMedia(item);
   }
 
   Future<void> _markFailed(MediaCapture item, String error) async {
