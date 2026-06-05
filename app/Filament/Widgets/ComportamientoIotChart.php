@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\LecturaIotResource\Widgets;
+namespace App\Filament\Widgets;
 
 use App\Models\LecturaIot;
 use Filament\Widgets\ChartWidget;

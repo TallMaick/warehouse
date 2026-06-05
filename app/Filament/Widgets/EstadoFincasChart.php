@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\FincaResource\Widgets;
+namespace App\Filament\Widgets;
 
 use App\Models\Finca;
 use Filament\Widgets\ChartWidget;

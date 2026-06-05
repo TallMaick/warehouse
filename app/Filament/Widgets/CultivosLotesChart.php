@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\LoteResource\Widgets;
+namespace App\Filament\Widgets;
 
 use App\Models\Lote;
 use Filament\Widgets\ChartWidget;
