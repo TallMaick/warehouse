@@ -76,12 +76,16 @@ class ApiService {
 
   Future<List<dynamic>> getFincas() async {
     final response = await _dio.get('/mis-fincas');
-    return response.data['data'] as List;
+    final data = response.data['data'];
+    if (data == null) return [];
+    return data as List;
   }
 
   Future<List<dynamic>> getLotes(int fincaId) async {
     final response = await _dio.get('/fincas/$fincaId/lotes');
-    return response.data['data'] as List;
+    final data = response.data['data'];
+    if (data == null) return [];
+    return data as List;
   }
 
   Future<Map<String, dynamic>> updateLoteEstado({

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/local_models.dart';
 import 'finca_detail_screen.dart';
@@ -18,12 +19,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _connectivity = ConnectivityService();
   bool _isConnected = true;
+  late final StreamSubscription<bool> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     _loadData();
-    _connectivity.onStatusChanged.listen((connected) {
+    _connectivitySubscription = _connectivity.onStatusChanged.listen((connected) {
       if (mounted) {
         setState(() => _isConnected = connected);
       }
@@ -33,6 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => _isConnected = connected);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {

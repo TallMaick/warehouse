@@ -35,7 +35,7 @@ class FincaLocal {
   factory FincaLocal.fromMap(Map<String, dynamic> map) {
     return FincaLocal(
       id: map['id'] as int?,
-      remoteId: map['remoteId'] as int,
+      remoteId: (map['remoteId'] as int?) ?? 0,
       nombre: map['nombre'] as String,
       latitud: map['latitud'] as String?,
       longitud: map['longitud'] as String?,
@@ -92,8 +92,8 @@ class LoteLocal {
   factory LoteLocal.fromMap(Map<String, dynamic> map) {
     return LoteLocal(
       id: map['id'] as int?,
-      remoteId: map['remoteId'] as int,
-      fincaRemoteId: map['fincaRemoteId'] as int,
+      remoteId: (map['remoteId'] as int?) ?? 0,
+      fincaRemoteId: (map['fincaRemoteId'] as int?) ?? 0,
       nombre: map['nombre'] as String,
       hectareas: map['hectareas'] as String?,
       tipoCultivo: map['tipoCultivo'] as String?,

@@ -30,8 +30,7 @@ class MinioService {
       categoria: categoria,
     );
 
-    final uploadUrlData = presignedData['upload_url'] as Map<String, dynamic>;
-    final uploadUrl = uploadUrlData['url'] as String;
+    final uploadUrl = presignedData['upload_url'] as String;
     final fileKey = presignedData['file_key'] as String;
     final fullUrl = presignedData['full_url'] as String;
 
