@@ -65,12 +65,16 @@ class PresignedUrlController extends Controller
             ]
         );
 
+        $uploadUrlString = is_array($uploadUrl)
+            ? ($uploadUrl['url'] ?? reset($uploadUrl))
+            : (string) $uploadUrl;
+
         $fullUrl = $disk->url($fileKey);
 
         return response()->json([
             'success' => true,
             'data' => [
-                'upload_url' => (string) $uploadUrl,
+                'upload_url' => $uploadUrlString,
                 'file_key'   => $fileKey,
                 'full_url'   => $fullUrl,
             ],
