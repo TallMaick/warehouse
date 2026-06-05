@@ -52,9 +52,9 @@ class ActividadForm
                             return [];
                         }
                         
-                        // Busca los lotes disponibles que pertenezcan a esa finca
+                        // Busca los lotes disponibles o en uso que pertenezcan a esa finca
                         return \App\Models\Lote::where('finca_id', $fincaId)
-                            ->where('estado', 'disponible')
+                            ->whereIn('estado', ['disponible', 'en_uso'])
                             ->pluck('nombre', 'id')
                             ->toArray();
                     })

@@ -5,7 +5,7 @@ namespace App\Filament\Resources\LecturaIots\Pages;
 use App\Filament\Resources\LecturaIots\LecturaIotResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\LecturaIotResource\Widgets\ComportamientoIotChart;
+use App\Filament\Widgets\ComportamientoIotChart;
 
 class ListLecturaIots extends ListRecords
 {

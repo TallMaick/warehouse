@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Fincas\Pages;
 use App\Filament\Resources\Fincas\FincaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\FincaResource\Widgets\EstadoFincasChart;
+use App\Filament\Widgets\EstadoFincasChart;
 
 class ListFincas extends ListRecords
 {
