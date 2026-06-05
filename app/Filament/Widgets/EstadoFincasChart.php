@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 class EstadoFincasChart extends ChartWidget
 {
     protected ?string $heading = 'Estado de Mis Fincas';
+    protected static ?int $sort = 3;
     protected ?string $maxHeight = '250px';
     protected int | string | array $columnSpan = 'full';
 

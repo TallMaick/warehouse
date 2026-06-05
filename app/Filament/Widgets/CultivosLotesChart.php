@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 class CultivosLotesChart extends ChartWidget
 {
     protected ?string $heading = 'Hectáreas por Tipo de Cultivo';
+    protected static ?int $sort = 3;
     protected ?string $maxHeight = '250px';
     protected int | string | array $columnSpan = 'full';
 

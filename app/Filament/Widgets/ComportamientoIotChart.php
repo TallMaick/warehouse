@@ -9,6 +9,7 @@ use Carbon\Carbon;
 class ComportamientoIotChart extends ChartWidget
 {
     protected ?string $heading = 'Comportamiento de Sensores (Últimos 7 Días)';
+    protected static ?int $sort = 3;
     protected ?string $maxHeight = '300px';
     // Hacemos que ocupe todo el ancho de la pantalla debajo de la tabla
     protected int | string | array $columnSpan = 'full';

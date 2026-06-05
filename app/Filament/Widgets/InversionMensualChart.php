@@ -9,6 +9,7 @@ use Carbon\Carbon;
 class InversionMensualChart extends ChartWidget
 {
     protected ?string $heading = 'Inversión Mensual (Año Actual)';
+    protected static ?int $sort = 3;
     protected ?string $maxHeight = '250px';
     protected int | string | array $columnSpan = 'full';
 

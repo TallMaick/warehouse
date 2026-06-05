@@ -10,7 +10,7 @@ class SensoresIotChart extends ChartWidget
     // Cambiamos el título para reflejar que es una lectura en tiempo real
     protected ?string $heading = 'Estado Actual de Sensores IoT';
     
-    protected static ?int $sort = 3; 
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {
