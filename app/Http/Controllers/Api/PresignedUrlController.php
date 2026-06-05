@@ -70,7 +70,7 @@ class PresignedUrlController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'upload_url' => $uploadUrl,
+                'upload_url' => (string) $uploadUrl,
                 'file_key'   => $fileKey,
                 'full_url'   => $fullUrl,
             ],
